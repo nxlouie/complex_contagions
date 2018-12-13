@@ -1,14 +1,23 @@
 import networkx as nx
 import random
+import matplotlib.pyplot as plt
 
 
 def main():
     # Watts Strogatz Ring Graph
     # do it at various levels
-    #
     ring_lattice = nx.watts_strogatz_graph(16, 4, 0)
+    # nx.draw(ring_lattice)
+    # plt.draw()
+    # plt.show()
     simple_contagion(ring_lattice)
     complex_contagion(ring_lattice, 2)
+
+    # 2 dimensional lattice with Moore neighborhoods
+    moore_lattice = create_moore_lattice(6, 8, 2)
+    # nx.draw(moore_lattice)
+    # plt.draw()
+    # plt.show()
 
 
 # simple contagion propagation
@@ -43,7 +52,6 @@ def complex_contagion(in_graph, a):
     :param a: number of activated nodes required for activation
     :return:
     """
-    in_graph = nx.watts_strogatz_graph(16, 4, 0)
 
     infected_nodes = set()
     # pick the starting node.
@@ -67,6 +75,26 @@ def complex_contagion(in_graph, a):
         infected_nodes = infected_nodes.union(nodes_to_add)
         print(time_step_number, ":", infected_nodes)
         time_step_number += 1
+
+
+def create_moore_lattice(m, n, radius=1):
+
+    moore_lattice = nx.generators.lattice.grid_2d_graph(m, n)
+
+    for node in moore_lattice.nodes():
+        nodes_to_add = set()
+        print("NODE", node)
+        for row in range(node[0] - radius, node[0] + radius + 1):
+            for column in range(node[1] - radius, node[1] + radius + 1):
+                if row < 0 or row > m - 1 or column < 0 or column > n - 1:
+                    continue
+                print(row, column)
+                nodes_to_add.add((row, column))
+        for add_node in nodes_to_add:
+            if node != add_node:
+                moore_lattice.add_edge(node, add_node)
+
+    return moore_lattice
 
 
 if __name__ == '__main__':
